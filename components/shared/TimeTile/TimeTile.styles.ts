@@ -3,7 +3,6 @@ import { colors } from "../../../theme/tokens";
 
 export const styles = StyleSheet.create({
   tile: {
-    flex: 1,
     backgroundColor: colors.tile,
     paddingVertical: 18,
     paddingHorizontal: 20,

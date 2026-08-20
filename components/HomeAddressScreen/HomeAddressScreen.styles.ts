@@ -11,7 +11,7 @@ export const styles = StyleSheet.create({
   headline: {
     fontFamily: "InstrumentSerif_400Regular",
     fontSize: 46,
-    lineHeight: 48,
+    lineHeight: 56,
     color: colors.ink,
     marginBottom: 12,
   },

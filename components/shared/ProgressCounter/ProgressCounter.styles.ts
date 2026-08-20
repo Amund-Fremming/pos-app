@@ -9,7 +9,7 @@ export const styles = StyleSheet.create({
     paddingTop: spacing.progressInset,
   },
   bar: {
-    width: 12,
+    width: 18,
     height: 30,
     borderWidth: 3,
     borderColor: colors.ink,

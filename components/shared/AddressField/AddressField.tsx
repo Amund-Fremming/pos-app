@@ -1,7 +1,10 @@
 import { useEffect, useRef } from "react";
 import { Animated, Text, TextInput, View } from "react-native";
+import { searchAddresses } from "../../../clients/locationClient";
 import { colors } from "../../../theme/tokens";
 import { styles } from "./AddressField.styles";
+
+const SEARCH_DEBOUNCE_MS = 200;
 
 type AddressFieldProps = {
   value: string;
@@ -35,6 +38,25 @@ export function AddressField({ value, onChangeText, placeholder, helperText, err
       Animated.timing(shakeAnim, { toValue: 0, duration: 50, useNativeDriver: true }),
     ]).start();
   }, [errorTrigger, errorAnim, shakeAnim]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => {
+      searchAddresses(value, controller.signal)
+        .then((results) => {
+          console.log(`[address search] "${value}" -> ${results.length} result(s)`);
+          results.forEach((r) => console.log(`  · ${r.label}  (${r.lat}, ${r.lon})`));
+        })
+        .catch((error) => {
+          if (error?.name !== "AbortError") console.log(`[address search] "${value}" failed:`, error);
+        });
+    }, SEARCH_DEBOUNCE_MS);
+
+    return () => {
+      clearTimeout(timeout);
+      controller.abort();
+    };
+  }, [value]);
 
   const borderBottomColor = errorAnim.interpolate({
     inputRange: [0, 1],

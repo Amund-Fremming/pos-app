@@ -8,7 +8,7 @@ export const styles = StyleSheet.create({
   headline: {
     fontFamily: "InstrumentSerif_400Regular",
     fontSize: 50,
-    lineHeight: 52,
+    lineHeight: 60,
     letterSpacing: -0.5,
     color: colors.ink,
     textAlign: "center",
