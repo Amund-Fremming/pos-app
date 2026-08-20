@@ -28,7 +28,7 @@ const OnboardingContext = createContext<OnboardingContextValue | null>(null);
 export function OnboardingProvider({ children }: { children: ReactNode }) {
   const [homeAddress, setHomeAddress] = useState("");
   const [workAddress, setWorkAddress] = useState("");
-  const [leaveHome, setLeaveHome] = useState(defaultTime(7, 30));
+  const [leaveHome, setLeaveHome] = useState(defaultTime(8, 0));
   const [leaveWork, setLeaveWork] = useState(defaultTime(16, 0));
   const [activeDays, setActiveDays] = useState([true, true, true, true, true, false, false]);
 

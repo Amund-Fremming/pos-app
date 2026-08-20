@@ -7,7 +7,6 @@ export const styles = StyleSheet.create({
     alignItems: "baseline",
     gap: 12,
     borderBottomWidth: 4,
-    borderBottomColor: colors.ink,
     paddingBottom: 12,
   },
   marker: {

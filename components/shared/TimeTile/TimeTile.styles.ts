@@ -26,4 +26,13 @@ export const styles = StyleSheet.create({
     lineHeight: 40,
     color: colors.ink,
   },
+  shadow: {
+    position: "absolute",
+    top: 6,
+    left: 5,
+    right: -5,
+    bottom: -6,
+    backgroundColor: colors.cardShadow,
+    borderRadius: 20,
+  },
 });

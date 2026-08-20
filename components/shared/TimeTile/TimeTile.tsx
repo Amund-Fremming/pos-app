@@ -1,12 +1,9 @@
-import DateTimePicker, { type DateTimePickerEvent } from "@react-native-community/datetimepicker";
-import { useState } from "react";
-import { Platform, Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { styles } from "./TimeTile.styles";
 
 type TimeTileProps = {
   label: string;
   value: Date;
-  onChange: (value: Date) => void;
 };
 
 function formatTime(date: Date): string {
@@ -15,23 +12,14 @@ function formatTime(date: Date): string {
   return `${hours}:${minutes}`;
 }
 
-export function TimeTile({ label, value, onChange }: TimeTileProps) {
-  const [showPicker, setShowPicker] = useState(false);
-
-  const handleChange = (event: DateTimePickerEvent, selected?: Date) => {
-    setShowPicker(Platform.OS === "ios");
-    if (event.type === "set" && selected) onChange(selected);
-  };
-
+export function TimeTile({ label, value }: TimeTileProps) {
   return (
     <View style={{ flex: 1 }}>
-      <Pressable style={styles.tile} onPress={() => setShowPicker(true)}>
+      <View style={styles.shadow} />
+      <View style={styles.tile}>
         <Text style={styles.label}>{label}</Text>
         <Text style={styles.value}>{formatTime(value)}</Text>
-      </Pressable>
-      {showPicker ? (
-        <DateTimePicker value={value} mode="time" is24Hour display="default" onChange={handleChange} />
-      ) : null}
+      </View>
     </View>
   );
 }

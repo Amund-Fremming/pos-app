@@ -10,6 +10,7 @@ export const colors = {
   ink55: "#5d7476",
   ink45: "#7b9092",
   chipIdle: "rgba(20,33,31,.07)",
+  error: "#b3261e",
 };
 
 export const fonts = {

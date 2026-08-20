@@ -13,7 +13,7 @@ const DAY_LABELS = ["M", "T", "O", "T", "F", "L", "S"];
 type Props = NativeStackScreenProps<OnboardingStackParamList, "TimesDays">;
 
 export function TimesDaysScreen(_props: Props) {
-  const { state, setLeaveHome, setLeaveWork, toggleDay } = useOnboarding();
+  const { state, toggleDay } = useOnboarding();
   const count = state.activeDays.filter(Boolean).length;
   const summary = count === 0 ? "Ingen dager valgt." : `${count} dager med varsel.`;
 
@@ -35,8 +35,8 @@ export function TimesDaysScreen(_props: Props) {
       <Text style={styles.body}>Varsel kommer 30 min før.</Text>
 
       <View style={styles.tileRow}>
-        <TimeTile label="Ut" value={state.leaveHome} onChange={setLeaveHome} />
-        <TimeTile label="Hjem" value={state.leaveWork} onChange={setLeaveWork} />
+        <TimeTile label="Ut" value={state.leaveHome} />
+        <TimeTile label="Hjem" value={state.leaveWork} />
       </View>
 
       <View style={styles.dayRow}>

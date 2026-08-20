@@ -25,9 +25,6 @@ export const styles = StyleSheet.create({
   tealFillPressed: {
     backgroundColor: colors.ink,
   },
-  disabled: {
-    opacity: 0.5,
-  },
   label: {
     fontFamily: "Karla_600SemiBold",
     fontSize: 19,
