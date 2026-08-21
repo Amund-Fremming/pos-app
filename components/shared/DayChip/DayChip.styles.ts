@@ -4,7 +4,6 @@ import { colors } from "../../../theme/tokens";
 export const styles = StyleSheet.create({
   chip: {
     flex: 1,
-    height: 56,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 3,

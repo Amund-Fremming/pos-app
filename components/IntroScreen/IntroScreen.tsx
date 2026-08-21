@@ -15,7 +15,7 @@ export function IntroScreen({ navigation }: Props) {
       align="center"
       footer={
         <>
-          <PrimaryButton label="Kom i gang" onPress={() => navigation.navigate("HomeAddress")} />
+          <PrimaryButton label="Kom i gang" onPress={() => navigation.navigate("Notifications")} />
           <Text style={styles.caption}>Ingen konto. Ingen oppsett etterpå.</Text>
         </>
       }

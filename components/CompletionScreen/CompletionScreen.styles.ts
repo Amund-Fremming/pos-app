@@ -2,24 +2,22 @@ import { StyleSheet } from "react-native";
 import { colors } from "../../theme/tokens";
 
 export const styles = StyleSheet.create({
-  eyebrow: {
-    fontFamily: "InstrumentSerif_400Regular_Italic",
-    fontSize: 22,
-    color: colors.ink55,
-    marginBottom: 12,
+  icon: {
+    marginBottom: 24,
   },
   headline: {
     fontFamily: "InstrumentSerif_400Regular",
-    fontSize: 46,
-    lineHeight: 56,
+    fontSize: 48,
+    lineHeight: 50,
     color: colors.ink,
-    marginBottom: 12,
+    textAlign: "center",
+    marginBottom: 18,
   },
   body: {
     fontFamily: "Karla_400Regular",
-    fontSize: 17,
-    lineHeight: 26,
+    fontSize: 18,
+    lineHeight: 27,
     color: colors.ink70,
-    marginBottom: 26,
+    textAlign: "center",
   },
 });

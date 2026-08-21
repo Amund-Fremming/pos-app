@@ -12,21 +12,21 @@ const DAY_LABELS = ["M", "T", "O", "T", "F", "L", "S"];
 
 type Props = NativeStackScreenProps<OnboardingStackParamList, "TimesDays">;
 
-export function TimesDaysScreen(_props: Props) {
+export function TimesDaysScreen({ navigation }: Props) {
   const { state, toggleDay } = useOnboarding();
   const count = state.activeDays.filter(Boolean).length;
   const summary = count === 0 ? "Ingen dager valgt." : `${count} dager med varsel.`;
 
   return (
     <OnboardingLayout
-      step={4}
+      step={5}
       align="left"
       footer={
         <PrimaryButton
           label="Ferdig"
           variant="teal"
-          // TODO: persist onboarding config, schedule notifications, and route to the main view
-          onPress={() => {}}
+          // TODO: persist onboarding config and schedule notifications
+          onPress={() => navigation.navigate("Completion")}
         />
       }
     >

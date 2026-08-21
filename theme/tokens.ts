@@ -11,6 +11,10 @@ export const colors = {
   ink45: "#7b9092",
   chipIdle: "rgba(20,33,31,.07)",
   error: "#b3261e",
+  sunFill: "#e8bb52",
+  cloudFront: "#c7d1d3",
+  cloudBack: "#a4b2b5",
+  rainDrop: "#5b7fb5",
 };
 
 export const fonts = {

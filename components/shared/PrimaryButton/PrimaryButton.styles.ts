@@ -25,10 +25,19 @@ export const styles = StyleSheet.create({
   tealFillPressed: {
     backgroundColor: colors.ink,
   },
+  outlineFill: {
+    backgroundColor: colors.cardShadow,
+  },
+  outlineFillPressed: {
+    backgroundColor: colors.cardShadow,
+  },
   label: {
     fontFamily: "Karla_600SemiBold",
     fontSize: 19,
     letterSpacing: 0.4,
     color: colors.paperTop,
+  },
+  labelInk: {
+    color: colors.ink,
   },
 });

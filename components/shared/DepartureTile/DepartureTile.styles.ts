@@ -3,6 +3,9 @@ import { colors } from "../../../theme/tokens";
 
 export const styles = StyleSheet.create({
   tile: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "baseline",
     backgroundColor: colors.tile,
     paddingVertical: 18,
     paddingHorizontal: 20,
@@ -17,11 +20,10 @@ export const styles = StyleSheet.create({
     fontFamily: "InstrumentSerif_400Regular_Italic",
     fontSize: 18,
     color: colors.ink55,
-    marginBottom: 4,
   },
   value: {
     fontFamily: "InstrumentSerif_400Regular",
-    fontSize: 40,
+    fontSize: 32,
     color: colors.ink,
   },
   shadow: {

@@ -27,7 +27,7 @@ export function HomeAddressScreen({ navigation }: Props) {
   };
 
   return (
-    <OnboardingLayout step={2} align="left" footer={<PrimaryButton label="Neste" onPress={handleNext} />}>
+    <OnboardingLayout step={3} align="left" footer={<PrimaryButton label="Neste" onPress={handleNext} />}>
       <Text style={styles.eyebrow}>Hjemme</Text>
       <Text style={styles.headline}>Hvor bor du?</Text>
       <Text style={styles.body}>Her starter turen din.</Text>
