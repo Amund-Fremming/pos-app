@@ -1,10 +1,13 @@
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { LinearGradient } from "expo-linear-gradient";
-import { KeyboardAvoidingView, Platform, Text, TextInput, View } from "react-native";
+import { useState } from "react";
+import { KeyboardAvoidingView, Platform, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { patchUserData } from "../../clients/backendClient";
 import { useOnboarding } from "../../context/OnboardingContext";
 import type { OnboardingStackParamList } from "../../navigation/types";
 import { colors } from "../../theme/tokens";
+import { AddressField } from "../shared/AddressField/AddressField";
 import { BackButton } from "../shared/BackButton/BackButton";
 import { DayChip } from "../shared/DayChip/DayChip";
 import { styles as layoutStyles } from "../shared/OnboardingLayout/OnboardingLayout.styles";
@@ -21,8 +24,39 @@ function formatTime(date: Date): string {
   return `${hours}:${minutes}`;
 }
 
+function toTimeString(date: Date): string {
+  return `${formatTime(date)}:00`;
+}
+
 export function SettingsScreen({ navigation }: Props) {
-  const { state, setHomeAddress, setWorkAddress, toggleDay } = useOnboarding();
+  const { state, setHomeAddress, setHomeCoords, setWorkAddress, setWorkCoords, toggleDay } = useOnboarding();
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    setError(null);
+    try {
+      await patchUserData({
+        home_time: toTimeString(state.leaveHome),
+        home_lat: state.homeLat ?? undefined,
+        home_lon: state.homeLon ?? undefined,
+        home_display: state.homeAddress,
+        work_time: toTimeString(state.leaveWork),
+        work_lat: state.workLat ?? undefined,
+        work_lon: state.workLon ?? undefined,
+        work_display: state.workAddress,
+        alert_days: state.activeDays,
+        push_token: state.pushToken ?? undefined,
+      });
+      navigation.navigate("Main");
+    } catch (err) {
+      console.warn("Failed to update user data", err);
+      setError("Klarte ikke å lagre. Prøv igjen.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <LinearGradient colors={[colors.paperTop, colors.paperBottom]} style={layoutStyles.canvas}>
@@ -35,24 +69,25 @@ export function SettingsScreen({ navigation }: Props) {
             <Text style={styles.eyebrow}>Oppsettet ditt</Text>
             <Text style={styles.headline}>Slik står det</Text>
 
-            <View style={styles.field}>
-              <Text style={styles.fieldLabel}>Hjemme</Text>
-              <TextInput
+            <View style={styles.addressField}>
+              <Text style={styles.addressFieldLabel}>Hjemme</Text>
+              <AddressField
                 value={state.homeAddress}
                 onChangeText={setHomeAddress}
-                style={styles.fieldValue}
-                returnKeyType="done"
+                onSelected={(suggestion) => setHomeCoords(suggestion.lat, suggestion.lon)}
+                placeholder="Storgata 12, Oslo"
               />
             </View>
-            <View style={styles.field}>
-              <Text style={styles.fieldLabel}>Jobb</Text>
-              <TextInput
+            <View style={styles.addressField}>
+              <Text style={styles.addressFieldLabel}>Jobb</Text>
+              <AddressField
                 value={state.workAddress}
                 onChangeText={setWorkAddress}
-                style={styles.fieldValue}
-                returnKeyType="done"
+                onSelected={(suggestion) => setWorkCoords(suggestion.lat, suggestion.lon)}
+                placeholder="Akersgata 55, Oslo"
               />
             </View>
+            {error ? <Text style={styles.fieldLabel}>{error}</Text> : null}
             <View style={styles.timeRow}>
               <View style={[styles.field, styles.timeField]}>
                 <Text style={styles.fieldLabel}>Ut</Text>
@@ -71,7 +106,7 @@ export function SettingsScreen({ navigation }: Props) {
             </View>
           </View>
           <View style={layoutStyles.buttonBlock}>
-            <PrimaryButton label="Lagre" onPress={() => navigation.navigate("Main")} />
+            <PrimaryButton label="Lagre" onPress={handleSave} disabled={isSaving} />
           </View>
         </KeyboardAvoidingView>
       </SafeAreaView>

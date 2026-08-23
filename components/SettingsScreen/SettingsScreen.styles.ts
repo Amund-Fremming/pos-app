@@ -25,10 +25,19 @@ export const styles = StyleSheet.create({
     paddingBottom: 10,
     marginBottom: 18,
   },
+  addressField: {
+    marginBottom: 18,
+  },
   fieldLabel: {
     fontFamily: "InstrumentSerif_400Regular_Italic",
     fontSize: 18,
     color: colors.ink55,
+  },
+  addressFieldLabel: {
+    fontFamily: "InstrumentSerif_400Regular_Italic",
+    fontSize: 18,
+    color: colors.ink55,
+    marginBottom: 6,
   },
   fieldValue: {
     fontFamily: "Karla_400Regular",

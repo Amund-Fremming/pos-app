@@ -1,5 +1,7 @@
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { useState } from "react";
 import { Text, View } from "react-native";
+import { createUserData } from "../../clients/backendClient";
 import { useOnboarding } from "../../context/OnboardingContext";
 import type { OnboardingStackParamList } from "../../navigation/types";
 import { DayChip } from "../shared/DayChip/DayChip";
@@ -12,23 +14,54 @@ const DAY_LABELS = ["M", "T", "O", "T", "F", "L", "S"];
 
 type Props = NativeStackScreenProps<OnboardingStackParamList, "TimesDays">;
 
+function toTimeString(date: Date): string {
+  const hours = date.getHours().toString().padStart(2, "0");
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+  return `${hours}:${minutes}:00`;
+}
+
 export function TimesDaysScreen({ navigation }: Props) {
   const { state, toggleDay } = useOnboarding();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const count = state.activeDays.filter(Boolean).length;
   const summary = count === 0 ? "Ingen dager valgt." : `${count} dager med varsel.`;
+
+  const handleFinish = async () => {
+    if (state.homeLat === null || state.homeLon === null || state.workLat === null || state.workLon === null) {
+      setError("Velg adresse fra listen på forrige steg.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError(null);
+    try {
+      await createUserData({
+        home_time: toTimeString(state.leaveHome),
+        home_lat: state.homeLat,
+        home_lon: state.homeLon,
+        home_display: state.homeAddress,
+        work_time: toTimeString(state.leaveWork),
+        work_lat: state.workLat,
+        work_lon: state.workLon,
+        work_display: state.workAddress,
+        alert_days: state.activeDays,
+        push_token: state.pushToken ?? undefined,
+      });
+      navigation.navigate("Completion");
+    } catch (err) {
+      console.warn("Failed to create user data", err);
+      setError("Klarte ikke å lagre. Prøv igjen.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <OnboardingLayout
       step={5}
       align="left"
-      footer={
-        <PrimaryButton
-          label="Ferdig"
-          variant="teal"
-          // TODO: persist onboarding config and schedule notifications
-          onPress={() => navigation.navigate("Completion")}
-        />
-      }
+      footer={<PrimaryButton label="Ferdig" variant="teal" onPress={handleFinish} disabled={isSubmitting} />}
     >
       <Text style={styles.eyebrow}>Tider</Text>
       <Text style={styles.headline}>Når drar du?</Text>
@@ -44,7 +77,7 @@ export function TimesDaysScreen({ navigation }: Props) {
           <DayChip key={index} label={label} active={state.activeDays[index]} onPress={() => toggleDay(index)} />
         ))}
       </View>
-      <Text style={styles.summary}>{summary}</Text>
+      <Text style={styles.summary}>{error ?? summary}</Text>
     </OnboardingLayout>
   );
 }

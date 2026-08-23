@@ -6,6 +6,7 @@ type PrimaryButtonProps = {
   label: string;
   onPress: () => void;
   variant?: "ink" | "teal" | "outline";
+  disabled?: boolean;
 };
 
 const SHADOW_COLOR: Record<NonNullable<PrimaryButtonProps["variant"]>, string> = {
@@ -20,27 +21,29 @@ const FILL_STYLE: Record<NonNullable<PrimaryButtonProps["variant"]>, [object, ob
   outline: [styles.outlineFill, styles.outlineFillPressed],
 };
 
-export function PrimaryButton({ label, onPress, variant = "ink" }: PrimaryButtonProps) {
+export function PrimaryButton({ label, onPress, variant = "ink", disabled }: PrimaryButtonProps) {
   const shadowColor = SHADOW_COLOR[variant];
   const [fillStyle, pressedFillStyle] = FILL_STYLE[variant];
 
   return (
     <View>
-      {variant !== "outline" && (
+      {variant !== "outline" && !disabled && (
         <View style={{ position: "absolute", top: 7, left: 6, right: -6, bottom: -7, backgroundColor: shadowColor, borderRadius: 22 }} />
       )}
       <Pressable
-        onPress={onPress}
+        onPress={disabled ? undefined : onPress}
+        disabled={disabled}
         style={({ pressed }) => [
           styles.button,
-          fillStyle,
-          pressed && pressedFillStyle,
-          variant !== "outline" && {
-            transform: pressed ? [{ translateX: 3 }, { translateY: 4 }] : [{ translateX: 0 }, { translateY: 0 }],
-          },
+          disabled ? styles.disabledFill : fillStyle,
+          !disabled && pressed && pressedFillStyle,
+          !disabled &&
+            variant !== "outline" && {
+              transform: pressed ? [{ translateX: 3 }, { translateY: 4 }] : [{ translateX: 0 }, { translateY: 0 }],
+            },
         ]}
       >
-        <Text style={[styles.label, variant === "outline" && styles.labelInk]}>{label}</Text>
+        <Text style={[styles.label, (variant === "outline" || disabled) && styles.labelInk, disabled && styles.labelDisabled]}>{label}</Text>
       </Pressable>
     </View>
   );

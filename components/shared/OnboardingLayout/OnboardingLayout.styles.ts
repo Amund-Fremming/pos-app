@@ -20,6 +20,10 @@ export const styles = StyleSheet.create({
   contentLeft: {
     paddingHorizontal: spacing.cardPaddingHorizontal,
   },
+  contentCompact: {
+    justifyContent: "flex-start",
+    paddingTop: 36,
+  },
   buttonBlock: {
     paddingHorizontal: spacing.cardPaddingHorizontal,
     paddingBottom: spacing.bottomButtonPadding,

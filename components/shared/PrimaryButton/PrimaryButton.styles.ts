@@ -31,6 +31,10 @@ export const styles = StyleSheet.create({
   outlineFillPressed: {
     backgroundColor: colors.cardShadow,
   },
+  disabledFill: {
+    backgroundColor: "rgba(20,33,31,.10)",
+    borderColor: "rgba(20,33,31,.28)",
+  },
   label: {
     fontFamily: "Karla_600SemiBold",
     fontSize: 19,
@@ -39,5 +43,8 @@ export const styles = StyleSheet.create({
   },
   labelInk: {
     color: colors.ink,
+  },
+  labelDisabled: {
+    color: colors.ink45,
   },
 });

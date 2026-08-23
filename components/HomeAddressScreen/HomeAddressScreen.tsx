@@ -1,6 +1,6 @@
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useState } from "react";
-import { Text } from "react-native";
+import { LayoutAnimation, Text } from "react-native";
 import { useOnboarding } from "../../context/OnboardingContext";
 import type { OnboardingStackParamList } from "../../navigation/types";
 import { AddressField } from "../shared/AddressField/AddressField";
@@ -10,33 +10,41 @@ import { styles } from "./HomeAddressScreen.styles";
 
 type Props = NativeStackScreenProps<OnboardingStackParamList, "HomeAddress">;
 
-function validateHomeAddress(homeAddress: string): boolean {
-  return homeAddress.trim().length > 0;
-}
-
 export function HomeAddressScreen({ navigation }: Props) {
-  const { state, setHomeAddress } = useOnboarding();
-  const [errorTrigger, setErrorTrigger] = useState(0);
+  const { state, setHomeAddress, setHomeCoords } = useOnboarding();
+  const [isSearching, setIsSearching] = useState(false);
+  const [isAddressConfirmed, setIsAddressConfirmed] = useState(false);
 
-  const handleNext = () => {
-    if (!validateHomeAddress(state.homeAddress)) {
-      setErrorTrigger((n) => n + 1);
-      return;
-    }
-    navigation.navigate("WorkAddress");
+  const handleSuggestingChange = (suggesting: boolean) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setIsSearching(suggesting);
+  };
+
+  const handleAddressChange = (text: string) => {
+    setHomeAddress(text);
+    setIsAddressConfirmed(false);
   };
 
   return (
-    <OnboardingLayout step={3} align="left" footer={<PrimaryButton label="Neste" onPress={handleNext} />}>
+    <OnboardingLayout
+      step={3}
+      align="left"
+      compact={isSearching}
+      footer={<PrimaryButton label="Neste" onPress={() => navigation.navigate("WorkAddress")} disabled={!isAddressConfirmed} />}
+    >
       <Text style={styles.eyebrow}>Hjemme</Text>
       <Text style={styles.headline}>Hvor bor du?</Text>
-      <Text style={styles.body}>Her starter turen din.</Text>
+      {!isSearching && <Text style={styles.body}>Her starter turen din.</Text>}
       <AddressField
         value={state.homeAddress}
-        onChangeText={setHomeAddress}
+        onChangeText={handleAddressChange}
+        onSelected={(suggestion) => {
+          setIsAddressConfirmed(true);
+          setHomeCoords(suggestion.lat, suggestion.lon);
+        }}
         placeholder="Storgata 12, Oslo"
         helperText="Vi bruker adressen bare til værvarsel."
-        errorTrigger={errorTrigger}
+        onSuggestingChange={handleSuggestingChange}
       />
     </OnboardingLayout>
   );
