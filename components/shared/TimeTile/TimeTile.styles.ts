@@ -12,6 +12,11 @@ export const styles = StyleSheet.create({
     borderTopRightRadius: 6,
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
+    shadowColor: colors.cardShadow,
+    shadowOffset: { width: 5, height: 6 },
+    shadowOpacity: 1,
+    shadowRadius: 0,
+    elevation: 6,
   },
   label: {
     fontFamily: "InstrumentSerif_400Regular_Italic",
@@ -23,14 +28,5 @@ export const styles = StyleSheet.create({
     fontFamily: "InstrumentSerif_400Regular",
     fontSize: 40,
     color: colors.ink,
-  },
-  shadow: {
-    position: "absolute",
-    top: 6,
-    left: 5,
-    right: -5,
-    bottom: -6,
-    backgroundColor: colors.cardShadow,
-    borderRadius: 20,
   },
 });

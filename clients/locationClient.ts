@@ -8,8 +8,10 @@ const ENDPOINT = "https://ws.geonorge.no/adresser/v1/sok";
 
 export interface AddressSuggestion {
   id: string;
-  /** "Storgata 12" */
+  /** As Kartverket returns it — may be prefixed with a landmark name, e.g. "Sandar kirke, Storgata 12". */
   addressText: string;
+  /** Just the street + number, e.g. "Storgata 12" — use this to fill a field once the user picks a suggestion. */
+  streetAddress: string;
   /** "Oslo" — the API returns "OSLO", we title-case it. */
   city: string;
   postalCode: string;
@@ -24,6 +26,16 @@ interface RawAddress {
   poststed?: string;
   postnummer?: string;
   representasjonspunkt?: { lat?: number; lon?: number };
+}
+
+/**
+ * Kartverket's `adressetekst` sometimes prefixes the street with a named
+ * building/landmark (`adressetilleggsnavn`), e.g. "Sandar kirke, Storgata 12".
+ * Only the part after the last comma is the actual street + number.
+ */
+function streetAddressOnly(addressText: string): string {
+  const parts = addressText.split(",");
+  return parts[parts.length - 1].trim();
 }
 
 function toTitleCase(value: string): string {
@@ -74,6 +86,7 @@ export async function searchAddresses(
       {
         id: `${addressText}|${postalCode}|${lat},${lon}`,
         addressText,
+        streetAddress: streetAddressOnly(addressText),
         city,
         postalCode,
         label: tail ? `${addressText}, ${tail}` : addressText,

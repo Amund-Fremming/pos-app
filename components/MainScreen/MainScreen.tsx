@@ -24,8 +24,14 @@ const COPY: Record<WeatherOutcome, { headline: string; body: string }> = {
 const OUTCOMES: WeatherOutcome[] = ["rain", "sun", "cloudy"];
 
 export function MainScreen({ navigation }: Props) {
-  const { state } = useOnboarding();
+  const { state, resetUser } = useOnboarding();
   const [outcomeIndex, setOutcomeIndex] = useState(() => Math.floor(Math.random() * OUTCOMES.length));
+
+  const handleResetUser = () => {
+    resetUser()
+      .then(() => navigation.reset({ index: 0, routes: [{ name: "Intro" }] }))
+      .catch((error) => console.warn("Failed to reset user", error));
+  };
 
   useEffect(() => {
     if (!state.userId) return;
@@ -53,6 +59,9 @@ export function MainScreen({ navigation }: Props) {
                 onPress={() => setOutcomeIndex((i) => (i + 1) % OUTCOMES.length)}
               >
                 <Text style={styles.debugButtonLabel}>Debug: neste vær</Text>
+              </Pressable>
+              <Pressable style={styles.debugButton} onPress={handleResetUser}>
+                <Text style={styles.debugButtonLabel}>Reset user</Text>
               </Pressable>
             </View>
           </View>

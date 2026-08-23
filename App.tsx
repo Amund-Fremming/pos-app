@@ -12,10 +12,39 @@ import { NotificationsScreen } from "./components/NotificationsScreen/Notificati
 import { SettingsScreen } from "./components/SettingsScreen/SettingsScreen";
 import { TimesDaysScreen } from "./components/TimesDaysScreen/TimesDaysScreen";
 import { WorkAddressScreen } from "./components/WorkAddressScreen/WorkAddressScreen";
-import { OnboardingProvider } from "./context/OnboardingContext";
+import { OnboardingProvider, useOnboarding } from "./context/OnboardingContext";
 import type { OnboardingStackParamList } from "./navigation/types";
 
 const Stack = createNativeStackNavigator<OnboardingStackParamList>();
+
+function AppNavigator() {
+  const { state, isReady } = useOnboarding();
+
+  if (!isReady) return null;
+
+  return (
+    <NavigationContainer>
+      <Stack.Navigator
+        initialRouteName={state.userId ? "Main" : "Intro"}
+        screenOptions={{
+          headerShown: false,
+          gestureEnabled: true,
+          fullScreenGestureEnabled: true,
+          animation: "slide_from_right",
+        }}
+      >
+        <Stack.Screen name="Intro" component={IntroScreen} />
+        <Stack.Screen name="Notifications" component={NotificationsScreen} />
+        <Stack.Screen name="HomeAddress" component={HomeAddressScreen} />
+        <Stack.Screen name="WorkAddress" component={WorkAddressScreen} />
+        <Stack.Screen name="TimesDays" component={TimesDaysScreen} />
+        <Stack.Screen name="Completion" component={CompletionScreen} />
+        <Stack.Screen name="Main" component={MainScreen} />
+        <Stack.Screen name="Settings" component={SettingsScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -31,26 +60,7 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <OnboardingProvider>
-        <NavigationContainer>
-          <Stack.Navigator
-            initialRouteName="Intro"
-            screenOptions={{
-              headerShown: false,
-              gestureEnabled: true,
-              fullScreenGestureEnabled: true,
-              animation: "slide_from_right",
-            }}
-          >
-            <Stack.Screen name="Intro" component={IntroScreen} />
-            <Stack.Screen name="Notifications" component={NotificationsScreen} />
-            <Stack.Screen name="HomeAddress" component={HomeAddressScreen} />
-            <Stack.Screen name="WorkAddress" component={WorkAddressScreen} />
-            <Stack.Screen name="TimesDays" component={TimesDaysScreen} />
-            <Stack.Screen name="Completion" component={CompletionScreen} />
-            <Stack.Screen name="Main" component={MainScreen} />
-            <Stack.Screen name="Settings" component={SettingsScreen} />
-          </Stack.Navigator>
-        </NavigationContainer>
+        <AppNavigator />
       </OnboardingProvider>
     </SafeAreaProvider>
   );

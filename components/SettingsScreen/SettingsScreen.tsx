@@ -1,7 +1,13 @@
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
-import { KeyboardAvoidingView, Platform, Pressable, Text, View } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  Text,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { patchUserData } from "../../clients/backendClient";
 import { useOnboarding } from "../../context/OnboardingContext";
@@ -32,8 +38,16 @@ function toTimeString(date: Date): string {
 }
 
 export function SettingsScreen({ navigation }: Props) {
-  const { state, setHomeAddress, setHomeCoords, setWorkAddress, setWorkCoords, setLeaveHome, setLeaveWork, toggleDay } =
-    useOnboarding();
+  const {
+    state,
+    setHomeAddress,
+    setHomeCoords,
+    setWorkAddress,
+    setWorkCoords,
+    setLeaveHome,
+    setLeaveWork,
+    toggleDay,
+  } = useOnboarding();
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [editingField, setEditingField] = useState<EditingField>(null);
@@ -69,9 +83,15 @@ export function SettingsScreen({ navigation }: Props) {
   };
 
   return (
-    <LinearGradient colors={[colors.paperTop, colors.paperBottom]} style={layoutStyles.canvas}>
+    <LinearGradient
+      colors={[colors.paperTop, colors.paperBottom]}
+      style={layoutStyles.canvas}
+    >
       <SafeAreaView style={layoutStyles.card} edges={["top", "bottom"]}>
-        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+        >
           <View style={styles.header}>
             <BackButton onPress={() => navigation.goBack()} />
           </View>
@@ -84,8 +104,10 @@ export function SettingsScreen({ navigation }: Props) {
               <AddressField
                 value={state.homeAddress}
                 onChangeText={setHomeAddress}
-                onSelected={(suggestion) => setHomeCoords(suggestion.lat, suggestion.lon)}
-                placeholder="Storgata 12, Oslo"
+                onSelected={(suggestion) =>
+                  setHomeCoords(suggestion.lat, suggestion.lon)
+                }
+                placeholder="Storgata 12"
               />
             </View>
             <View style={styles.addressField}>
@@ -93,30 +115,52 @@ export function SettingsScreen({ navigation }: Props) {
               <AddressField
                 value={state.workAddress}
                 onChangeText={setWorkAddress}
-                onSelected={(suggestion) => setWorkCoords(suggestion.lat, suggestion.lon)}
-                placeholder="Akersgata 55, Oslo"
+                onSelected={(suggestion) =>
+                  setWorkCoords(suggestion.lat, suggestion.lon)
+                }
+                placeholder="Akersgata 55"
               />
             </View>
             {error ? <Text style={styles.fieldLabel}>{error}</Text> : null}
             <View style={styles.timeRow}>
-              <Pressable style={[styles.field, styles.timeField]} onPress={() => setEditingField("home")}>
+              <Pressable
+                style={[styles.field, styles.timeField]}
+                onPress={() => setEditingField("home")}
+              >
                 <Text style={styles.fieldLabel}>Ut</Text>
-                <Text style={styles.timeValue}>{formatTime(state.leaveHome)}</Text>
+                <Text style={styles.timeValue}>
+                  {formatTime(state.leaveHome)}
+                </Text>
               </Pressable>
-              <Pressable style={[styles.field, styles.timeField]} onPress={() => setEditingField("work")}>
+              <Pressable
+                style={[styles.field, styles.timeField]}
+                onPress={() => setEditingField("work")}
+              >
                 <Text style={styles.fieldLabel}>Hjem</Text>
-                <Text style={styles.timeValue}>{formatTime(state.leaveWork)}</Text>
+                <Text style={styles.timeValue}>
+                  {formatTime(state.leaveWork)}
+                </Text>
               </Pressable>
             </View>
 
             <View style={styles.dayRow}>
               {DAY_LABELS.map((label, index) => (
-                <DayChip key={index} label={label} active={state.activeDays[index]} onPress={() => toggleDay(index)} size={48} />
+                <DayChip
+                  key={index}
+                  label={label}
+                  active={state.activeDays[index]}
+                  onPress={() => toggleDay(index)}
+                  size={48}
+                />
               ))}
             </View>
           </View>
           <View style={layoutStyles.buttonBlock}>
-            <PrimaryButton label="Lagre" onPress={handleSave} disabled={isSaving} />
+            <PrimaryButton
+              label="Lagre"
+              onPress={handleSave}
+              disabled={isSaving}
+            />
           </View>
         </KeyboardAvoidingView>
       </SafeAreaView>
@@ -125,7 +169,9 @@ export function SettingsScreen({ navigation }: Props) {
         visible={editingField !== null}
         value={editingField === "work" ? state.leaveWork : state.leaveHome}
         onClose={() => setEditingField(null)}
-        onConfirm={(value) => (editingField === "work" ? setLeaveWork(value) : setLeaveHome(value))}
+        onConfirm={(value) =>
+          editingField === "work" ? setLeaveWork(value) : setLeaveHome(value)
+        }
       />
     </LinearGradient>
   );

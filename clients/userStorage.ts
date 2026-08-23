@@ -10,3 +10,7 @@ export async function getStoredUserId(): Promise<string | null> {
 export async function setStoredUserId(id: string): Promise<void> {
   await AsyncStorage.setItem(USER_ID_KEY, id);
 }
+
+export async function clearStoredUserId(): Promise<void> {
+  await AsyncStorage.removeItem(USER_ID_KEY);
+}

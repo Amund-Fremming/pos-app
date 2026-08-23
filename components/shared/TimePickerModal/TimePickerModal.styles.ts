@@ -16,7 +16,7 @@ export const styles = StyleSheet.create({
   },
   sheet: {
     backgroundColor: colors.paperTop,
-    borderTopWidth: 3,
+    borderWidth: 3,
     borderColor: colors.ink,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,

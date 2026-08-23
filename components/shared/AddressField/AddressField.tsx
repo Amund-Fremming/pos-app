@@ -141,7 +141,7 @@ export function AddressField({
 
   const handleSelect = (suggestion: AddressSuggestion) => {
     animateLayout();
-    onChangeText(suggestion.addressText);
+    onChangeText(suggestion.streetAddress);
     onSelected?.(suggestion);
     setShowPanel(false);
   };

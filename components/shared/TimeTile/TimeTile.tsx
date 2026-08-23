@@ -1,4 +1,4 @@
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text } from "react-native";
 import { styles } from "./TimeTile.styles";
 
 type TimeTileProps = {
@@ -15,12 +15,9 @@ function formatTime(date: Date): string {
 
 export function TimeTile({ label, value, onPress }: TimeTileProps) {
   return (
-    <Pressable style={{ flex: 1 }} onPress={onPress}>
-      <View style={styles.shadow} />
-      <View style={styles.tile}>
-        <Text style={styles.label}>{label}</Text>
-        <Text style={styles.value}>{formatTime(value)}</Text>
-      </View>
+    <Pressable style={[styles.tile, { flex: 1 }]} onPress={onPress}>
+      <Text style={styles.label}>{label}</Text>
+      <Text style={styles.value}>{formatTime(value)}</Text>
     </Pressable>
   );
 }
