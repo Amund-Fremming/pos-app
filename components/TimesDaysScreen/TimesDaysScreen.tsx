@@ -7,10 +7,13 @@ import type { OnboardingStackParamList } from "../../navigation/types";
 import { DayChip } from "../shared/DayChip/DayChip";
 import { OnboardingLayout } from "../shared/OnboardingLayout/OnboardingLayout";
 import { PrimaryButton } from "../shared/PrimaryButton/PrimaryButton";
+import { TimePickerModal } from "../shared/TimePickerModal/TimePickerModal";
 import { TimeTile } from "../shared/TimeTile/TimeTile";
 import { styles } from "./TimesDaysScreen.styles";
 
 const DAY_LABELS = ["M", "T", "O", "T", "F", "L", "S"];
+
+type EditingField = "home" | "work" | null;
 
 type Props = NativeStackScreenProps<OnboardingStackParamList, "TimesDays">;
 
@@ -21,9 +24,10 @@ function toTimeString(date: Date): string {
 }
 
 export function TimesDaysScreen({ navigation }: Props) {
-  const { state, toggleDay } = useOnboarding();
+  const { state, toggleDay, setUserId, setLeaveHome, setLeaveWork } = useOnboarding();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [editingField, setEditingField] = useState<EditingField>(null);
   const count = state.activeDays.filter(Boolean).length;
   const summary = count === 0 ? "Ingen dager valgt." : `${count} dager med varsel.`;
 
@@ -36,7 +40,7 @@ export function TimesDaysScreen({ navigation }: Props) {
     setIsSubmitting(true);
     setError(null);
     try {
-      await createUserData({
+      const created = await createUserData({
         home_time: toTimeString(state.leaveHome),
         home_lat: state.homeLat,
         home_lon: state.homeLon,
@@ -48,6 +52,7 @@ export function TimesDaysScreen({ navigation }: Props) {
         alert_days: state.activeDays,
         push_token: state.pushToken ?? undefined,
       });
+      setUserId(created.id);
       navigation.navigate("Completion");
     } catch (err) {
       console.warn("Failed to create user data", err);
@@ -65,11 +70,11 @@ export function TimesDaysScreen({ navigation }: Props) {
     >
       <Text style={styles.eyebrow}>Tider</Text>
       <Text style={styles.headline}>Når drar du?</Text>
-      <Text style={styles.body}>Varsel kommer 30 min før.</Text>
+      <Text style={styles.body}>Varsel kommer 15 min før.</Text>
 
       <View style={styles.tileRow}>
-        <TimeTile label="Ut" value={state.leaveHome} />
-        <TimeTile label="Hjem" value={state.leaveWork} />
+        <TimeTile label="Ut" value={state.leaveHome} onPress={() => setEditingField("home")} />
+        <TimeTile label="Hjem" value={state.leaveWork} onPress={() => setEditingField("work")} />
       </View>
 
       <View style={styles.dayRow}>
@@ -78,6 +83,13 @@ export function TimesDaysScreen({ navigation }: Props) {
         ))}
       </View>
       <Text style={styles.summary}>{error ?? summary}</Text>
+
+      <TimePickerModal
+        visible={editingField !== null}
+        value={editingField === "work" ? state.leaveWork : state.leaveHome}
+        onClose={() => setEditingField(null)}
+        onConfirm={(value) => (editingField === "work" ? setLeaveWork(value) : setLeaveHome(value))}
+      />
     </OnboardingLayout>
   );
 }

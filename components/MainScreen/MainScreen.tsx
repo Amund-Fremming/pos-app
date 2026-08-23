@@ -1,8 +1,9 @@
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { LinearGradient } from "expo-linear-gradient";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { getWeather } from "../../clients/backendClient";
 import { useOnboarding } from "../../context/OnboardingContext";
 import type { OnboardingStackParamList } from "../../navigation/types";
 import { colors } from "../../theme/tokens";
@@ -24,8 +25,15 @@ const OUTCOMES: WeatherOutcome[] = ["rain", "sun", "cloudy"];
 
 export function MainScreen({ navigation }: Props) {
   const { state } = useOnboarding();
-  // No forecast pipeline wired up yet — starts on a random outcome, cycled by the debug button below.
   const [outcomeIndex, setOutcomeIndex] = useState(() => Math.floor(Math.random() * OUTCOMES.length));
+
+  useEffect(() => {
+    if (!state.userId) return;
+    getWeather(state.userId)
+      .then((outcome) => setOutcomeIndex(OUTCOMES.indexOf(outcome)))
+      .catch((error) => console.warn("Failed to fetch weather", error));
+  }, [state.userId]);
+
   const outcome = OUTCOMES[outcomeIndex];
   const { headline, body } = COPY[outcome];
 

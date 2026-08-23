@@ -1,6 +1,8 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { getStoredUserId, setStoredUserId } from "../clients/userStorage";
 
 export type OnboardingState = {
+  userId: string | null;
   homeAddress: string;
   homeLat: number | null;
   homeLon: number | null;
@@ -15,6 +17,7 @@ export type OnboardingState = {
 
 type OnboardingContextValue = {
   state: OnboardingState;
+  setUserId: (id: string) => void;
   setHomeAddress: (value: string) => void;
   setHomeCoords: (lat: number, lon: number) => void;
   setWorkAddress: (value: string) => void;
@@ -34,6 +37,7 @@ function defaultTime(hours: number, minutes: number): Date {
 const OnboardingContext = createContext<OnboardingContextValue | null>(null);
 
 export function OnboardingProvider({ children }: { children: ReactNode }) {
+  const [userId, setUserIdState] = useState<string | null>(null);
   const [homeAddress, setHomeAddressText] = useState("");
   const [homeLat, setHomeLat] = useState<number | null>(null);
   const [homeLon, setHomeLon] = useState<number | null>(null);
@@ -44,6 +48,17 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
   const [leaveWork, setLeaveWork] = useState(defaultTime(16, 0));
   const [activeDays, setActiveDays] = useState([true, true, true, true, true, false, false]);
   const [pushToken, setPushToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    getStoredUserId().then((id) => {
+      if (id) setUserIdState(id);
+    });
+  }, []);
+
+  const setUserId = (id: string) => {
+    setUserIdState(id);
+    setStoredUserId(id).catch((error) => console.warn("Failed to persist user id", error));
+  };
 
   const setHomeAddress = (value: string) => {
     setHomeAddressText(value);
@@ -73,7 +88,8 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<OnboardingContextValue>(
     () => ({
-      state: { homeAddress, homeLat, homeLon, workAddress, workLat, workLon, leaveHome, leaveWork, activeDays, pushToken },
+      state: { userId, homeAddress, homeLat, homeLon, workAddress, workLat, workLon, leaveHome, leaveWork, activeDays, pushToken },
+      setUserId,
       setHomeAddress,
       setHomeCoords,
       setWorkAddress,
@@ -83,7 +99,7 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
       toggleDay,
       setPushToken,
     }),
-    [homeAddress, homeLat, homeLon, workAddress, workLat, workLon, leaveHome, leaveWork, activeDays, pushToken]
+    [userId, homeAddress, homeLat, homeLon, workAddress, workLat, workLon, leaveHome, leaveWork, activeDays, pushToken]
   );
 
   return <OnboardingContext.Provider value={value}>{children}</OnboardingContext.Provider>;

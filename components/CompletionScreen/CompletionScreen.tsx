@@ -25,7 +25,7 @@ export function CompletionScreen({ navigation }: Props) {
         <CheckCircleIcon />
       </View>
       <Text style={styles.headline}>Alt klart</Text>
-      <Text style={styles.body}>Du hører fra oss 30 minutter før du drar. Ingenting mer å gjøre.</Text>
+      <Text style={styles.body}>Du hører fra oss 15 minutter før du drar. Ingenting mer å gjøre.</Text>
     </OnboardingLayout>
   );
 }

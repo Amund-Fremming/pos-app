@@ -82,7 +82,7 @@ export function NotificationsScreen({ navigation }: Props) {
       <Text style={styles.headline}>Slå på varsler</Text>
       <Text style={styles.body}>
         {granted
-          ? "Varsler er på. Vi sier fra 30 minutter før du drar."
+          ? "Varsler er på. Vi sier fra 15 minutter før du drar."
           : "Hele appen er varselet. Uten tillatelse kan vi ikke si fra når regnet kommer."}
       </Text>
     </OnboardingLayout>

@@ -1,7 +1,7 @@
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
-import { KeyboardAvoidingView, Platform, Text, View } from "react-native";
+import { KeyboardAvoidingView, Platform, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { patchUserData } from "../../clients/backendClient";
 import { useOnboarding } from "../../context/OnboardingContext";
@@ -12,9 +12,12 @@ import { BackButton } from "../shared/BackButton/BackButton";
 import { DayChip } from "../shared/DayChip/DayChip";
 import { styles as layoutStyles } from "../shared/OnboardingLayout/OnboardingLayout.styles";
 import { PrimaryButton } from "../shared/PrimaryButton/PrimaryButton";
+import { TimePickerModal } from "../shared/TimePickerModal/TimePickerModal";
 import { styles } from "./SettingsScreen.styles";
 
 const DAY_LABELS = ["M", "T", "O", "T", "F", "L", "S"];
+
+type EditingField = "home" | "work" | null;
 
 type Props = NativeStackScreenProps<OnboardingStackParamList, "Settings">;
 
@@ -29,15 +32,22 @@ function toTimeString(date: Date): string {
 }
 
 export function SettingsScreen({ navigation }: Props) {
-  const { state, setHomeAddress, setHomeCoords, setWorkAddress, setWorkCoords, toggleDay } = useOnboarding();
+  const { state, setHomeAddress, setHomeCoords, setWorkAddress, setWorkCoords, setLeaveHome, setLeaveWork, toggleDay } =
+    useOnboarding();
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [editingField, setEditingField] = useState<EditingField>(null);
 
   const handleSave = async () => {
+    if (!state.userId) {
+      setError("Fant ikke brukeren. Prøv å starte appen på nytt.");
+      return;
+    }
+
     setIsSaving(true);
     setError(null);
     try {
-      await patchUserData({
+      await patchUserData(state.userId, {
         home_time: toTimeString(state.leaveHome),
         home_lat: state.homeLat ?? undefined,
         home_lon: state.homeLon ?? undefined,
@@ -89,14 +99,14 @@ export function SettingsScreen({ navigation }: Props) {
             </View>
             {error ? <Text style={styles.fieldLabel}>{error}</Text> : null}
             <View style={styles.timeRow}>
-              <View style={[styles.field, styles.timeField]}>
+              <Pressable style={[styles.field, styles.timeField]} onPress={() => setEditingField("home")}>
                 <Text style={styles.fieldLabel}>Ut</Text>
                 <Text style={styles.timeValue}>{formatTime(state.leaveHome)}</Text>
-              </View>
-              <View style={[styles.field, styles.timeField]}>
+              </Pressable>
+              <Pressable style={[styles.field, styles.timeField]} onPress={() => setEditingField("work")}>
                 <Text style={styles.fieldLabel}>Hjem</Text>
                 <Text style={styles.timeValue}>{formatTime(state.leaveWork)}</Text>
-              </View>
+              </Pressable>
             </View>
 
             <View style={styles.dayRow}>
@@ -110,6 +120,13 @@ export function SettingsScreen({ navigation }: Props) {
           </View>
         </KeyboardAvoidingView>
       </SafeAreaView>
+
+      <TimePickerModal
+        visible={editingField !== null}
+        value={editingField === "work" ? state.leaveWork : state.leaveHome}
+        onClose={() => setEditingField(null)}
+        onConfirm={(value) => (editingField === "work" ? setLeaveWork(value) : setLeaveHome(value))}
+      />
     </LinearGradient>
   );
 }

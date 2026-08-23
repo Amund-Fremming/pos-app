@@ -3,6 +3,8 @@
  * Base URL comes from EXPO_PUBLIC_API_URL, falling back to the local dev server.
  */
 
+import type { WeatherOutcome } from "../components/shared/WeatherIcon/WeatherIcon";
+
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:6767";
 
 export interface UserDataPayload {
@@ -20,8 +22,12 @@ export interface UserDataPayload {
 
 export type UserDataPatchPayload = Partial<UserDataPayload>;
 
-/** Creates the user's commute config (onboarding completion). */
-export async function createUserData(payload: UserDataPayload): Promise<void> {
+export interface UserData extends UserDataPayload {
+  id: string;
+}
+
+/** Creates the user's commute config (onboarding completion). Returns the created row, including its id. */
+export async function createUserData(payload: UserDataPayload): Promise<UserData> {
   const res = await fetch(`${BASE_URL}/api/v1/user-data`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -29,15 +35,31 @@ export async function createUserData(payload: UserDataPayload): Promise<void> {
   });
 
   if (!res.ok) throw new Error(`Failed to create user data: ${res.status}`);
+  return res.json();
 }
 
-/** Patches the user's commute config (settings edits). Only the passed fields are updated. */
-export async function patchUserData(payload: UserDataPatchPayload): Promise<void> {
-  const res = await fetch(`${BASE_URL}/api/v1/user-data`, {
+/** Fetches the user's commute config by id. */
+export async function getUserData(id: string): Promise<UserData> {
+  const res = await fetch(`${BASE_URL}/api/v1/user-data/${id}`);
+  if (!res.ok) throw new Error(`Failed to fetch user data: ${res.status}`);
+  return res.json();
+}
+
+/** Patches the user's commute config by id (settings edits). Only the passed fields are updated. */
+export async function patchUserData(id: string, payload: UserDataPatchPayload): Promise<UserData> {
+  const res = await fetch(`${BASE_URL}/api/v1/user-data/${id}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
 
   if (!res.ok) throw new Error(`Failed to update user data: ${res.status}`);
+  return res.json();
+}
+
+/** Fetches the default weather outcome for the user's home screen. */
+export async function getWeather(id: string): Promise<WeatherOutcome> {
+  const res = await fetch(`${BASE_URL}/api/v1/weather/${id}`);
+  if (!res.ok) throw new Error(`Failed to fetch weather: ${res.status}`);
+  return res.json();
 }
