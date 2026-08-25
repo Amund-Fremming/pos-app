@@ -16,26 +16,6 @@ export const styles = StyleSheet.create({
   },
   icon: {
     marginBottom: 22,
-    position: "relative",
-  },
-  debugButtonWrap: {
-    position: "absolute",
-    top: -14,
-    left: 0,
-    right: 0,
-    alignItems: "center",
-    gap: 6,
-  },
-  debugButton: {
-    paddingVertical: 4,
-    paddingHorizontal: 10,
-    borderRadius: 10,
-    backgroundColor: "rgba(20,33,31,.55)",
-  },
-  debugButtonLabel: {
-    fontFamily: "Karla_600SemiBold",
-    fontSize: 11,
-    color: colors.paperTop,
   },
   headline: {
     fontFamily: "InstrumentSerif_400Regular",

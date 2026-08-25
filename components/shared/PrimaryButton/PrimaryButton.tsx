@@ -6,6 +6,8 @@ type PrimaryButtonProps = {
   label: string;
   onPress: () => void;
   variant?: "ink" | "teal" | "outline";
+  /** Skips the offset drop-shadow block behind the button (and its press-translate), so nothing renders past the button's own bounds. */
+  noShadow?: boolean;
   disabled?: boolean;
 };
 
@@ -21,13 +23,15 @@ const FILL_STYLE: Record<NonNullable<PrimaryButtonProps["variant"]>, [object, ob
   outline: [styles.outlineFill, styles.outlineFillPressed],
 };
 
-export function PrimaryButton({ label, onPress, variant = "ink", disabled }: PrimaryButtonProps) {
+export function PrimaryButton({ label, onPress, variant = "ink", noShadow, disabled }: PrimaryButtonProps) {
   const shadowColor = SHADOW_COLOR[variant];
   const [fillStyle, pressedFillStyle] = FILL_STYLE[variant];
 
+  const flat = variant === "outline" || noShadow;
+
   return (
     <View>
-      {variant !== "outline" && !disabled && (
+      {!flat && !disabled && (
         <View style={{ position: "absolute", top: 7, left: 6, right: -6, bottom: -7, backgroundColor: shadowColor, borderRadius: 22 }} />
       )}
       <Pressable
@@ -38,7 +42,7 @@ export function PrimaryButton({ label, onPress, variant = "ink", disabled }: Pri
           disabled ? styles.disabledFill : fillStyle,
           !disabled && pressed && pressedFillStyle,
           !disabled &&
-            variant !== "outline" && {
+            !flat && {
               transform: pressed ? [{ translateX: 3 }, { translateY: 4 }] : [{ translateX: 0 }, { translateY: 0 }],
             },
         ]}

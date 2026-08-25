@@ -2,9 +2,11 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
 import {
+  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
+  ScrollView,
   Text,
   View,
 } from "react-native";
@@ -55,11 +57,33 @@ export function SettingsScreen({ navigation }: Props) {
     setLeaveWork,
     toggleDay,
     setCommuteMinutes,
+    resetUser,
   } = useOnboarding();
   const { showApiError } = useApiError();
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [editingField, setEditingField] = useState<EditingField>(null);
+
+  const handleDeleteUser = () => {
+    Alert.alert(
+      "Slett bruker",
+      "Dette sletter alt oppsettet ditt og du må starte på nytt. Er du sikker?",
+      [
+        { text: "Avbryt", style: "cancel" },
+        {
+          text: "Slett",
+          style: "destructive",
+          onPress: () => {
+            resetUser()
+              .then(() =>
+                navigation.reset({ index: 0, routes: [{ name: "Intro" }] }),
+              )
+              .catch((err) => console.warn("Failed to delete user", err));
+          },
+        },
+      ],
+    );
+  };
 
   const handleSave = async () => {
     if (!state.userId) {
@@ -105,7 +129,12 @@ export function SettingsScreen({ navigation }: Props) {
           <View style={styles.header}>
             <BackButton onPress={() => navigation.goBack()} />
           </View>
-          <View style={[layoutStyles.content, layoutStyles.contentLeft]}>
+          <ScrollView
+            style={styles.scroll}
+            contentContainerStyle={[layoutStyles.contentLeft, styles.scrollContent]}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
             <Text style={styles.eyebrow}>Oppsettet ditt</Text>
             <Text style={styles.headline}>Slik står det</Text>
 
@@ -165,7 +194,7 @@ export function SettingsScreen({ navigation }: Props) {
               ))}
             </View>
 
-            <Text style={styles.addressFieldLabel}>Reisetid</Text>
+            <Text style={styles.reisetidLabel}>Reisetid</Text>
             <View style={styles.durationGrid}>
               {DURATION_OPTIONS.map((minutes) => (
                 <MinutesChip
@@ -176,10 +205,15 @@ export function SettingsScreen({ navigation }: Props) {
                 />
               ))}
             </View>
-          </View>
-          <View style={layoutStyles.buttonBlock}>
+
+            <Pressable style={styles.deleteButton} onPress={handleDeleteUser}>
+              <Text style={styles.deleteButtonLabel}>Slett bruker</Text>
+            </Pressable>
+          </ScrollView>
+          <View style={[layoutStyles.buttonBlock, styles.footer]}>
             <PrimaryButton
               label="Lagre"
+              noShadow
               onPress={handleSave}
               disabled={isSaving}
             />

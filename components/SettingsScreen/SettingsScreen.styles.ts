@@ -39,6 +39,22 @@ export const styles = StyleSheet.create({
     color: colors.ink55,
     marginBottom: 6,
   },
+  reisetidLabel: {
+    fontFamily: "InstrumentSerif_400Regular_Italic",
+    fontSize: 18,
+    color: colors.ink55,
+    marginTop: 28,
+    marginBottom: 6,
+  },
+  scroll: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 24,
+  },
+  footer: {
+    paddingTop: 20,
+  },
   fieldValue: {
     fontFamily: "Karla_400Regular",
     fontSize: 21,
@@ -70,5 +86,17 @@ export const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: 8,
     marginTop: 24,
+  },
+  deleteButton: {
+    alignSelf: "center",
+    marginTop: 32,
+  },
+  deleteButtonLabel: {
+    fontFamily: "Karla_600SemiBold",
+    fontSize: 15,
+    color: colors.error,
+    paddingBottom: 1.5,
+    borderBottomWidth: 2,
+    borderBottomColor: colors.error,
   },
 });
