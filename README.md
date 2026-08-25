@@ -1,8 +1,8 @@
 # pos-app
 
-npx eas login
+npx eas-cli login
 npx expo-doctor
-npx eas init 
-npx eas build:configure 
-npx eas build --platform ios # first run: say yes to auto-generate APNs push key
-npx eas submit --platform ios --latest
+npx eas-cli init
+npx eas-cli build:configure
+npx eas-cli build --platform ios # first run: say yes to auto-generate APNs push key
+npx eas-cli submit --platform ios --latest

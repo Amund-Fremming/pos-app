@@ -1,11 +1,10 @@
 /**
  * Client for the pos-backend Rust service (see ../../pos-backend).
- * Base URL comes from EXPO_PUBLIC_API_URL, falling back to the local dev server.
  */
 
 import type { WeatherOutcome } from "../components/shared/WeatherIcon/WeatherIcon";
 
-const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:6969";
+const BASE_URL = "https://pos-backend-production-1ad2.up.railway.app";
 
 export interface UserDataPayload {
   home_time: string;
