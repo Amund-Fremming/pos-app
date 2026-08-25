@@ -9,9 +9,11 @@ import { HomeAddressScreen } from "./components/HomeAddressScreen/HomeAddressScr
 import { IntroScreen } from "./components/IntroScreen/IntroScreen";
 import { MainScreen } from "./components/MainScreen/MainScreen";
 import { NotificationsScreen } from "./components/NotificationsScreen/NotificationsScreen";
+import { ReisetidScreen } from "./components/ReisetidScreen/ReisetidScreen";
 import { SettingsScreen } from "./components/SettingsScreen/SettingsScreen";
 import { TimesDaysScreen } from "./components/TimesDaysScreen/TimesDaysScreen";
 import { WorkAddressScreen } from "./components/WorkAddressScreen/WorkAddressScreen";
+import { ApiErrorProvider } from "./context/ApiErrorContext";
 import { OnboardingProvider, useOnboarding } from "./context/OnboardingContext";
 import type { OnboardingStackParamList } from "./navigation/types";
 
@@ -38,6 +40,7 @@ function AppNavigator() {
         <Stack.Screen name="HomeAddress" component={HomeAddressScreen} />
         <Stack.Screen name="WorkAddress" component={WorkAddressScreen} />
         <Stack.Screen name="TimesDays" component={TimesDaysScreen} />
+        <Stack.Screen name="Reisetid" component={ReisetidScreen} />
         <Stack.Screen name="Completion" component={CompletionScreen} />
         <Stack.Screen name="Main" component={MainScreen} />
         <Stack.Screen name="Settings" component={SettingsScreen} />
@@ -59,9 +62,11 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-      <OnboardingProvider>
-        <AppNavigator />
-      </OnboardingProvider>
+      <ApiErrorProvider>
+        <OnboardingProvider>
+          <AppNavigator />
+        </OnboardingProvider>
+      </ApiErrorProvider>
     </SafeAreaProvider>
   );
 }

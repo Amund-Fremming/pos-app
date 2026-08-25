@@ -1,7 +1,6 @@
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useState } from "react";
 import { Text, View } from "react-native";
-import { createUserData } from "../../clients/backendClient";
 import { useOnboarding } from "../../context/OnboardingContext";
 import type { OnboardingStackParamList } from "../../navigation/types";
 import { DayChip } from "../shared/DayChip/DayChip";
@@ -24,49 +23,27 @@ function toTimeString(date: Date): string {
 }
 
 export function TimesDaysScreen({ navigation }: Props) {
-  const { state, toggleDay, setUserId, setLeaveHome, setLeaveWork } = useOnboarding();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { state, toggleDay, setLeaveHome, setLeaveWork } = useOnboarding();
   const [error, setError] = useState<string | null>(null);
   const [editingField, setEditingField] = useState<EditingField>(null);
   const count = state.activeDays.filter(Boolean).length;
   const summary = count === 0 ? "Ingen dager valgt." : `${count} dager med varsel.`;
 
-  const handleFinish = async () => {
+  const handleNext = () => {
     if (state.homeLat === null || state.homeLon === null || state.workLat === null || state.workLon === null) {
       setError("Velg adresse fra listen på forrige steg.");
       return;
     }
 
-    setIsSubmitting(true);
     setError(null);
-    try {
-      const created = await createUserData({
-        home_time: toTimeString(state.leaveHome),
-        home_lat: state.homeLat,
-        home_lon: state.homeLon,
-        home_display: state.homeAddress,
-        work_time: toTimeString(state.leaveWork),
-        work_lat: state.workLat,
-        work_lon: state.workLon,
-        work_display: state.workAddress,
-        alert_days: state.activeDays,
-        push_token: state.pushToken ?? undefined,
-      });
-      setUserId(created.id);
-      navigation.navigate("Completion");
-    } catch (err) {
-      console.warn("Failed to create user data", err);
-      setError("Klarte ikke å lagre. Prøv igjen.");
-    } finally {
-      setIsSubmitting(false);
-    }
+    navigation.navigate("Reisetid");
   };
 
   return (
     <OnboardingLayout
       step={5}
       align="left"
-      footer={<PrimaryButton label="Ferdig" variant="teal" onPress={handleFinish} disabled={isSubmitting} />}
+      footer={<PrimaryButton label="Neste" variant="teal" onPress={handleNext} />}
     >
       <Text style={styles.eyebrow}>Tider</Text>
       <Text style={styles.headline}>Når drar du?</Text>

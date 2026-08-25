@@ -13,6 +13,7 @@ export type OnboardingState = {
   leaveHome: Date;
   leaveWork: Date;
   activeDays: boolean[]; // Mon..Sun
+  commuteMinutes: number;
   pushToken: string | null;
 };
 
@@ -28,6 +29,7 @@ type OnboardingContextValue = {
   setLeaveHome: (value: Date) => void;
   setLeaveWork: (value: Date) => void;
   toggleDay: (index: number) => void;
+  setCommuteMinutes: (value: number) => void;
   setPushToken: (value: string) => void;
   /** Clears the stored user and resets onboarding state to defaults — for starting over. */
   resetUser: () => Promise<void>;
@@ -47,6 +49,7 @@ function parseTimeString(time: string): Date {
 const OnboardingContext = createContext<OnboardingContextValue | null>(null);
 
 const DEFAULT_ACTIVE_DAYS = [true, true, true, true, true, false, false];
+const DEFAULT_COMMUTE_MINUTES = 30;
 
 export function OnboardingProvider({ children }: { children: ReactNode }) {
   const [isReady, setIsReady] = useState(false);
@@ -60,6 +63,7 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
   const [leaveHome, setLeaveHome] = useState(defaultTime(8, 0));
   const [leaveWork, setLeaveWork] = useState(defaultTime(16, 0));
   const [activeDays, setActiveDays] = useState(DEFAULT_ACTIVE_DAYS);
+  const [commuteMinutes, setCommuteMinutes] = useState(DEFAULT_COMMUTE_MINUTES);
   const [pushToken, setPushToken] = useState<string | null>(null);
 
   useEffect(() => {
@@ -82,6 +86,7 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
         setLeaveHome(parseTimeString(data.home_time));
         setLeaveWork(parseTimeString(data.work_time));
         setActiveDays(data.alert_days);
+        setCommuteMinutes(data.commute_minutes);
         setPushToken(data.push_token ?? null);
       } catch (error) {
         console.warn("Failed to load stored user, starting over", error);
@@ -109,6 +114,7 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
     setLeaveHome(defaultTime(8, 0));
     setLeaveWork(defaultTime(16, 0));
     setActiveDays(DEFAULT_ACTIVE_DAYS);
+    setCommuteMinutes(DEFAULT_COMMUTE_MINUTES);
     setPushToken(null);
   };
 
@@ -140,7 +146,7 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<OnboardingContextValue>(
     () => ({
-      state: { userId, homeAddress, homeLat, homeLon, workAddress, workLat, workLon, leaveHome, leaveWork, activeDays, pushToken },
+      state: { userId, homeAddress, homeLat, homeLon, workAddress, workLat, workLon, leaveHome, leaveWork, activeDays, commuteMinutes, pushToken },
       isReady,
       setUserId,
       setHomeAddress,
@@ -150,10 +156,11 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
       setLeaveHome,
       setLeaveWork,
       toggleDay,
+      setCommuteMinutes,
       setPushToken,
       resetUser,
     }),
-    [isReady, userId, homeAddress, homeLat, homeLon, workAddress, workLat, workLon, leaveHome, leaveWork, activeDays, pushToken]
+    [isReady, userId, homeAddress, homeLat, homeLon, workAddress, workLat, workLon, leaveHome, leaveWork, activeDays, commuteMinutes, pushToken]
   );
 
   return <OnboardingContext.Provider value={value}>{children}</OnboardingContext.Provider>;

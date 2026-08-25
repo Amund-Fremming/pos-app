@@ -5,7 +5,7 @@
 
 import type { WeatherOutcome } from "../components/shared/WeatherIcon/WeatherIcon";
 
-const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:6767";
+const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:6969";
 
 export interface UserDataPayload {
   home_time: string;
@@ -17,6 +17,7 @@ export interface UserDataPayload {
   work_lon: number;
   work_display: string;
   alert_days: boolean[];
+  commute_minutes: number;
   push_token?: string;
 }
 

@@ -4,6 +4,7 @@ export type OnboardingStackParamList = {
   HomeAddress: undefined;
   WorkAddress: undefined;
   TimesDays: undefined;
+  Reisetid: undefined;
   Completion: undefined;
   Main: undefined;
   Settings: undefined;

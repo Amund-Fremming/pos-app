@@ -10,18 +10,25 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { patchUserData } from "../../clients/backendClient";
+import { useApiError } from "../../context/ApiErrorContext";
 import { useOnboarding } from "../../context/OnboardingContext";
 import type { OnboardingStackParamList } from "../../navigation/types";
 import { colors } from "../../theme/tokens";
 import { AddressField } from "../shared/AddressField/AddressField";
 import { BackButton } from "../shared/BackButton/BackButton";
 import { DayChip } from "../shared/DayChip/DayChip";
+import { MinutesChip } from "../shared/MinutesChip/MinutesChip";
 import { styles as layoutStyles } from "../shared/OnboardingLayout/OnboardingLayout.styles";
 import { PrimaryButton } from "../shared/PrimaryButton/PrimaryButton";
 import { TimePickerModal } from "../shared/TimePickerModal/TimePickerModal";
 import { styles } from "./SettingsScreen.styles";
 
 const DAY_LABELS = ["M", "T", "O", "T", "F", "L", "S"];
+const DURATION_OPTIONS = [10, 15, 20, 30, 45, 60];
+
+function formatDurationLabel(minutes: number): string {
+  return minutes === 60 ? "1 time" : `${minutes} min`;
+}
 
 type EditingField = "home" | "work" | null;
 
@@ -47,7 +54,9 @@ export function SettingsScreen({ navigation }: Props) {
     setLeaveHome,
     setLeaveWork,
     toggleDay,
+    setCommuteMinutes,
   } = useOnboarding();
+  const { showApiError } = useApiError();
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [editingField, setEditingField] = useState<EditingField>(null);
@@ -71,12 +80,13 @@ export function SettingsScreen({ navigation }: Props) {
         work_lon: state.workLon ?? undefined,
         work_display: state.workAddress,
         alert_days: state.activeDays,
+        commute_minutes: state.commuteMinutes,
         push_token: state.pushToken ?? undefined,
       });
       navigation.navigate("Main");
     } catch (err) {
       console.warn("Failed to update user data", err);
-      setError("Klarte ikke å lagre. Prøv igjen.");
+      showApiError(handleSave);
     } finally {
       setIsSaving(false);
     }
@@ -151,6 +161,18 @@ export function SettingsScreen({ navigation }: Props) {
                   active={state.activeDays[index]}
                   onPress={() => toggleDay(index)}
                   size={48}
+                />
+              ))}
+            </View>
+
+            <Text style={styles.addressFieldLabel}>Reisetid</Text>
+            <View style={styles.durationGrid}>
+              {DURATION_OPTIONS.map((minutes) => (
+                <MinutesChip
+                  key={minutes}
+                  label={formatDurationLabel(minutes)}
+                  selected={state.commuteMinutes === minutes}
+                  onPress={() => setCommuteMinutes(minutes)}
                 />
               ))}
             </View>

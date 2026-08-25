@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getWeather } from "../../clients/backendClient";
+import { useApiError } from "../../context/ApiErrorContext";
 import { useOnboarding } from "../../context/OnboardingContext";
 import type { OnboardingStackParamList } from "../../navigation/types";
 import { colors } from "../../theme/tokens";
@@ -25,6 +26,7 @@ const OUTCOMES: WeatherOutcome[] = ["rain", "sun", "cloudy"];
 
 export function MainScreen({ navigation }: Props) {
   const { state, resetUser } = useOnboarding();
+  const { showApiError } = useApiError();
   const [outcomeIndex, setOutcomeIndex] = useState(() => Math.floor(Math.random() * OUTCOMES.length));
 
   const handleResetUser = () => {
@@ -34,11 +36,18 @@ export function MainScreen({ navigation }: Props) {
   };
 
   useEffect(() => {
-    if (!state.userId) return;
-    getWeather(state.userId)
-      .then((outcome) => setOutcomeIndex(OUTCOMES.indexOf(outcome)))
-      .catch((error) => console.warn("Failed to fetch weather", error));
-  }, [state.userId]);
+    const userId = state.userId;
+    if (!userId) return;
+
+    const fetchWeather = () =>
+      getWeather(userId)
+        .then((outcome) => setOutcomeIndex(OUTCOMES.indexOf(outcome)))
+        .catch((error) => {
+          console.warn("Failed to fetch weather", error);
+          showApiError(fetchWeather);
+        });
+    fetchWeather();
+  }, [state.userId, showApiError]);
 
   const outcome = OUTCOMES[outcomeIndex];
   const { headline, body } = COPY[outcome];

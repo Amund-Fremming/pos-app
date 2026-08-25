@@ -65,4 +65,10 @@ export const styles = StyleSheet.create({
     gap: 8,
     marginTop: 24,
   },
+  durationGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginTop: 24,
+  },
 });
