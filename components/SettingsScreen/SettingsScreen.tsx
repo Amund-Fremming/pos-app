@@ -1,6 +1,6 @@
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { LinearGradient } from "expo-linear-gradient";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   Alert,
   KeyboardAvoidingView,
@@ -63,6 +63,13 @@ export function SettingsScreen({ navigation }: Props) {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [editingField, setEditingField] = useState<EditingField>(null);
+  const scrollRef = useRef<ScrollView>(null);
+  const homeFieldOffset = useRef(0);
+  const workFieldOffset = useRef(0);
+
+  const scrollFieldToTop = (offset: number) => {
+    scrollRef.current?.scrollTo({ y: Math.max(offset - 12, 0), animated: true });
+  };
 
   const handleDeleteUser = () => {
     Alert.alert(
@@ -85,6 +92,20 @@ export function SettingsScreen({ navigation }: Props) {
     );
   };
 
+  const buildUserDataPayload = () => ({
+    home_time: toTimeString(state.leaveHome),
+    home_lat: state.homeLat ?? undefined,
+    home_lon: state.homeLon ?? undefined,
+    home_display: state.homeAddress,
+    work_time: toTimeString(state.leaveWork),
+    work_lat: state.workLat ?? undefined,
+    work_lon: state.workLon ?? undefined,
+    work_display: state.workAddress,
+    alert_days: state.activeDays,
+    commute_minutes: state.commuteMinutes,
+    push_token: state.pushToken ?? undefined,
+  });
+
   const handleSave = async () => {
     if (!state.userId) {
       setError("Fant ikke brukeren. Prøv å starte appen på nytt.");
@@ -94,19 +115,7 @@ export function SettingsScreen({ navigation }: Props) {
     setIsSaving(true);
     setError(null);
     try {
-      await patchUserData(state.userId, {
-        home_time: toTimeString(state.leaveHome),
-        home_lat: state.homeLat ?? undefined,
-        home_lon: state.homeLon ?? undefined,
-        home_display: state.homeAddress,
-        work_time: toTimeString(state.leaveWork),
-        work_lat: state.workLat ?? undefined,
-        work_lon: state.workLon ?? undefined,
-        work_display: state.workAddress,
-        alert_days: state.activeDays,
-        commute_minutes: state.commuteMinutes,
-        push_token: state.pushToken ?? undefined,
-      });
+      await patchUserData(state.userId, buildUserDataPayload());
       navigation.navigate("Main");
     } catch (err) {
       console.warn("Failed to update user data", err);
@@ -114,6 +123,15 @@ export function SettingsScreen({ navigation }: Props) {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleBack = () => {
+    if (state.userId) {
+      patchUserData(state.userId, buildUserDataPayload()).catch((err) =>
+        console.warn("Failed to save user data on back", err),
+      );
+    }
+    navigation.goBack();
   };
 
   return (
@@ -126,19 +144,25 @@ export function SettingsScreen({ navigation }: Props) {
           style={{ flex: 1 }}
           behavior={Platform.OS === "ios" ? "padding" : undefined}
         >
-          <View style={styles.header}>
-            <BackButton onPress={() => navigation.goBack()} />
-          </View>
           <ScrollView
+            ref={scrollRef}
             style={styles.scroll}
             contentContainerStyle={[layoutStyles.contentLeft, styles.scrollContent]}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
           >
+            <View style={styles.backButtonRow}>
+              <BackButton onPress={handleBack} />
+            </View>
             <Text style={styles.eyebrow}>Oppsettet ditt</Text>
             <Text style={styles.headline}>Slik står det</Text>
 
-            <View style={styles.addressField}>
+            <View
+              style={styles.addressField}
+              onLayout={(e) => {
+                homeFieldOffset.current = e.nativeEvent.layout.y;
+              }}
+            >
               <Text style={styles.addressFieldLabel}>Hjemme</Text>
               <AddressField
                 value={state.homeAddress}
@@ -147,9 +171,17 @@ export function SettingsScreen({ navigation }: Props) {
                   setHomeCoords(suggestion.lat, suggestion.lon)
                 }
                 placeholder="Storgata 12"
+                onSuggestingChange={(isFocused) =>
+                  isFocused && scrollFieldToTop(homeFieldOffset.current)
+                }
               />
             </View>
-            <View style={styles.addressField}>
+            <View
+              style={styles.addressField}
+              onLayout={(e) => {
+                workFieldOffset.current = e.nativeEvent.layout.y;
+              }}
+            >
               <Text style={styles.addressFieldLabel}>Jobb</Text>
               <AddressField
                 value={state.workAddress}
@@ -158,6 +190,9 @@ export function SettingsScreen({ navigation }: Props) {
                   setWorkCoords(suggestion.lat, suggestion.lon)
                 }
                 placeholder="Akersgata 55"
+                onSuggestingChange={(isFocused) =>
+                  isFocused && scrollFieldToTop(workFieldOffset.current)
+                }
               />
             </View>
             {error ? <Text style={styles.fieldLabel}>{error}</Text> : null}
@@ -209,15 +244,16 @@ export function SettingsScreen({ navigation }: Props) {
             <Pressable style={styles.deleteButton} onPress={handleDeleteUser}>
               <Text style={styles.deleteButtonLabel}>Slett bruker</Text>
             </Pressable>
+
+            <View style={styles.footer}>
+              <PrimaryButton
+                label="Lagre"
+                noShadow
+                onPress={handleSave}
+                disabled={isSaving}
+              />
+            </View>
           </ScrollView>
-          <View style={[layoutStyles.buttonBlock, styles.footer]}>
-            <PrimaryButton
-              label="Lagre"
-              noShadow
-              onPress={handleSave}
-              disabled={isSaving}
-            />
-          </View>
         </KeyboardAvoidingView>
       </SafeAreaView>
 

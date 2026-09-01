@@ -19,11 +19,11 @@ export function OnboardingLayout({ step, align, compact, children, footer }: Onb
   return (
     <LinearGradient colors={[colors.paperTop, colors.paperBottom]} style={styles.canvas}>
       <SafeAreaView style={styles.card} edges={["top", "bottom"]}>
+        <ProgressCounter step={step} />
         <KeyboardAvoidingView
           style={{ flex: 1 }}
           behavior={Platform.OS === "ios" ? "padding" : undefined}
         >
-          <ProgressCounter step={step} />
           <View
             style={[
               styles.content,
@@ -33,8 +33,8 @@ export function OnboardingLayout({ step, align, compact, children, footer }: Onb
           >
             {children}
           </View>
-          <View style={styles.buttonBlock}>{footer}</View>
         </KeyboardAvoidingView>
+        <View style={styles.buttonBlock}>{footer}</View>
       </SafeAreaView>
     </LinearGradient>
   );

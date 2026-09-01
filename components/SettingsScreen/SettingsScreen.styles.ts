@@ -2,9 +2,9 @@ import { StyleSheet } from "react-native";
 import { colors } from "../../theme/tokens";
 
 export const styles = StyleSheet.create({
-  header: {
-    paddingHorizontal: 30,
-    paddingTop: 30,
+  backButtonRow: {
+    paddingTop: 16,
+    marginBottom: 20,
   },
   eyebrow: {
     fontFamily: "InstrumentSerif_400Regular_Italic",
@@ -54,6 +54,7 @@ export const styles = StyleSheet.create({
   },
   footer: {
     paddingTop: 20,
+    paddingBottom: 20,
   },
   fieldValue: {
     fontFamily: "Karla_400Regular",

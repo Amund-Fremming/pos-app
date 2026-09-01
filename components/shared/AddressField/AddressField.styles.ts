@@ -65,13 +65,14 @@ export const styles = StyleSheet.create({
   },
   list: {
     flexGrow: 0,
+    maxHeight: 280,
   },
   suggestionRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 14,
     paddingHorizontal: 18,
-    paddingVertical: 15,
+    paddingVertical: 10,
     borderBottomWidth: 2,
     borderBottomColor: "rgba(20,33,31,.12)",
   },

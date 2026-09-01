@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Animated, FlatList, LayoutAnimation, Platform, Text, TextInput, TouchableOpacity, UIManager, View } from "react-native";
+import { Animated, LayoutAnimation, Platform, ScrollView, Text, TextInput, TouchableOpacity, UIManager, View } from "react-native";
 import { searchAddresses, type AddressSuggestion } from "../../../clients/locationClient";
 import { colors } from "../../../theme/tokens";
 import { AddressPinIcon } from "../AddressPinIcon/AddressPinIcon";
@@ -43,6 +43,7 @@ export function AddressField({
   const shakeAnim = useRef(new Animated.Value(0)).current;
 
   const [showPanel, setShowPanel] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const [loading, setLoading] = useState(false);
   const [searchFailed, setSearchFailed] = useState(false);
   const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([]);
@@ -126,13 +127,16 @@ export function AddressField({
 
   const handleFocus = () => {
     if (blurTimeout.current) clearTimeout(blurTimeout.current);
+    animateLayout();
+    setIsFocused(true);
     if (value.trim().length >= MIN_QUERY_LENGTH && !showPanel) {
-      animateLayout();
       setShowPanel(true);
     }
   };
 
   const handleBlur = () => {
+    animateLayout();
+    setIsFocused(false);
     blurTimeout.current = setTimeout(() => {
       animateLayout();
       setShowPanel(false);
@@ -147,15 +151,15 @@ export function AddressField({
   };
 
   const panelVisible = showPanel && value.trim().length >= MIN_QUERY_LENGTH;
-  const headerText = loading ? "Søker…" : searchFailed ? "Fant ikke søket" : `${suggestions.length} treff`;
+  const headerText = loading && suggestions.length === 0 ? "Søker…" : searchFailed ? "Fant ikke søket" : null;
 
   const lastReportedSuggesting = useRef(false);
   useEffect(() => {
-    if (lastReportedSuggesting.current !== panelVisible) {
-      lastReportedSuggesting.current = panelVisible;
-      onSuggestingChange?.(panelVisible);
+    if (lastReportedSuggesting.current !== isFocused) {
+      lastReportedSuggesting.current = isFocused;
+      onSuggestingChange?.(isFocused);
     }
-  }, [panelVisible, onSuggestingChange]);
+  }, [isFocused, onSuggestingChange]);
 
   return (
     <View>
@@ -176,9 +180,11 @@ export function AddressField({
       {helperText && !panelVisible ? <Text style={styles.helper}>{helperText}</Text> : null}
       {panelVisible ? (
         <View style={styles.panel}>
-          <View style={styles.panelHeader}>
-            <Text style={styles.panelHeaderText}>{headerText}</Text>
-          </View>
+          {headerText ? (
+            <View style={styles.panelHeader}>
+              <Text style={styles.panelHeaderText}>{headerText}</Text>
+            </View>
+          ) : null}
           {searchFailed ? (
             <TouchableOpacity style={styles.emptyRow} onPress={() => setRetryToken((n) => n + 1)}>
               <Text style={styles.retryText}>Prøv igjen</Text>
@@ -188,13 +194,10 @@ export function AddressField({
               <Text style={styles.emptyText}>Ingen treff. Prøv gateadresse og sted.</Text>
             </View>
           ) : (
-            <FlatList
-              data={suggestions}
-              keyExtractor={(item) => item.id}
-              keyboardShouldPersistTaps="handled"
-              style={styles.list}
-              renderItem={({ item, index }) => (
+            <ScrollView style={styles.list} nestedScrollEnabled keyboardShouldPersistTaps="handled">
+              {suggestions.map((item, index) => (
                 <TouchableOpacity
+                  key={item.id}
                   style={[styles.suggestionRow, index === suggestions.length - 1 && styles.suggestionRowLast]}
                   onPress={() => handleSelect(item)}
                 >
@@ -210,8 +213,8 @@ export function AddressField({
                     </Text>
                   </View>
                 </TouchableOpacity>
-              )}
-            />
+              ))}
+            </ScrollView>
           )}
         </View>
       ) : null}
