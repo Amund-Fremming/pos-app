@@ -13,7 +13,8 @@ import { styles } from "./NotificationsScreen.styles";
 
 async function fetchPushToken(): Promise<string> {
   const projectId =
-    Constants.expoConfig?.extra?.eas?.projectId ?? Constants.easConfig?.projectId;
+    Constants.expoConfig?.extra?.eas?.projectId ??
+    Constants.easConfig?.projectId;
 
   const { data: token } = await Notifications.getExpoPushTokenAsync(
     projectId ? { projectId } : undefined,
@@ -31,7 +32,13 @@ export function NotificationsScreen({ navigation }: Props) {
 
   const refreshStatus = useCallback(async () => {
     const { status: current } = await Notifications.getPermissionsAsync();
-    setStatus(current === "granted" ? "granted" : current === "denied" ? "denied" : "undetermined");
+    setStatus(
+      current === "granted"
+        ? "granted"
+        : current === "denied"
+          ? "denied"
+          : "undetermined",
+    );
   }, []);
 
   useFocusEffect(
@@ -41,11 +48,15 @@ export function NotificationsScreen({ navigation }: Props) {
         if (next === "active") refreshStatus();
       });
       return () => sub.remove();
-    }, [refreshStatus])
+    }, [refreshStatus]),
   );
 
   const handlePress = async () => {
     if (status === "granted") {
+      fetchPushToken()
+        .then(setPushToken)
+        .catch((error) => console.warn("Failed to fetch push token", error));
+
       navigation.navigate("HomeAddress");
       return;
     }
