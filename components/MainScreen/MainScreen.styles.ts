@@ -11,9 +11,14 @@ export const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+  },
+  // flexGrow keeps a short day centred; a long list of intervals scrolls instead of clipping.
+  contentInner: {
+    flexGrow: 1,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 32,
+    paddingVertical: 16,
   },
   eyebrow: {
     fontFamily: "InstrumentSerif_400Regular_Italic",

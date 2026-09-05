@@ -1,6 +1,6 @@
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { LinearGradient } from "expo-linear-gradient";
-import { ActivityIndicator, Text, View } from "react-native";
+import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useOnboarding } from "../../context/OnboardingContext";
 import type { OnboardingStackParamList } from "../../navigation/types";
@@ -26,11 +26,11 @@ export function MainScreen({ navigation }: Props) {
           {advice?.kind === "dayOff" && <Text style={styles.eyebrow}>Fridag</Text>}
           <GearButton onPress={() => navigation.navigate("Settings")} />
         </View>
-        <View style={styles.content}>
+        <ScrollView style={styles.content} contentContainerStyle={styles.contentInner}>
           {!advice && <ActivityIndicator color={colors.ink} />}
           {advice?.kind === "commute" && <CommuteView outcome={advice.outcome} />}
           {advice?.kind === "dayOff" && <DayOffView intervals={advice.intervals} />}
-        </View>
+        </ScrollView>
         <View style={layoutStyles.buttonBlock}>
           <DepartureTile value={state.leaveHome} onPress={() => navigation.navigate("Settings")} />
           <Text style={styles.caption}>Trykk for å endre</Text>

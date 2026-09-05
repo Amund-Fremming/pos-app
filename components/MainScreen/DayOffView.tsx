@@ -18,7 +18,6 @@ export function DayOffView({ intervals }: { intervals: JacketInterval[] }) {
 
   return (
     <>
-      <Text style={styles.eyebrow}>Fridag</Text>
       <View style={styles.icon}>
         <WeatherIcon outcome="rain" />
       </View>
