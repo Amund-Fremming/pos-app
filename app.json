@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "pos-app",
+    "name": "Pøs",
     "slug": "pos-app",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/rain-icon.png",
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true,
@@ -15,10 +15,8 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+        "backgroundColor": "#F2F0EA",
+        "foregroundImage": "./assets/rain-icon.png"
       },
       "predictiveBackGestureEnabled": false
     },
@@ -31,7 +29,16 @@
       [
         "expo-notifications",
         {
-          "icon": "./assets/icon.png"
+          "icon": "./assets/rain-icon.png"
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/rain-icon.png",
+          "imageWidth": 220,
+          "resizeMode": "contain",
+          "backgroundColor": "#F2F0EA"
         }
       ]
     ],

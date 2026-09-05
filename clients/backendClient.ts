@@ -84,3 +84,18 @@ export async function getWeather(id: string): Promise<WeatherOutcome> {
   if (!res.ok) throw new Error(`Failed to fetch weather: ${res.status}`);
   return res.json();
 }
+
+/** A stretch of today worth carrying a jacket for, as "HH:MM" Oslo wall-clock. */
+export interface JacketInterval {
+  from: string;
+  to: string;
+}
+
+/** Today's wet stretches around home — the off-day view, when there's no commute to report on. */
+export async function getJacketIntervals(id: string): Promise<JacketInterval[]> {
+  if (IS_MOCK) return [{ from: "07:00", to: "09:00" }];
+
+  const res = await fetch(`${BASE_URL}/api/v1/weather/${id}/jacket-intervals`);
+  if (!res.ok) throw new Error(`Failed to fetch jacket intervals: ${res.status}`);
+  return res.json();
+}

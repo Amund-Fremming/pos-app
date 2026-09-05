@@ -1,63 +1,35 @@
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { LinearGradient } from "expo-linear-gradient";
-import { useEffect, useState } from "react";
-import { Text, View } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { getWeather } from "../../clients/backendClient";
-import { useApiError } from "../../context/ApiErrorContext";
 import { useOnboarding } from "../../context/OnboardingContext";
 import type { OnboardingStackParamList } from "../../navigation/types";
 import { colors } from "../../theme/tokens";
 import { DepartureTile } from "../shared/DepartureTile/DepartureTile";
 import { GearButton } from "../shared/GearButton/GearButton";
 import { styles as layoutStyles } from "../shared/OnboardingLayout/OnboardingLayout.styles";
-import { WeatherIcon, type WeatherOutcome } from "../shared/WeatherIcon/WeatherIcon";
+import { CommuteView } from "./CommuteView";
+import { DayOffView } from "./DayOffView";
 import { styles } from "./MainScreen.styles";
+import { useTodaysAdvice } from "./useTodaysAdvice";
 
 type Props = NativeStackScreenProps<OnboardingStackParamList, "Main">;
 
-const COPY: Record<WeatherOutcome, { headline: string; body: string }> = {
-  rain: { headline: "Ta med regnjakka", body: "Regn fra 07:10 til 09:40 langs ruta di." },
-  sun: { headline: "La regnjakka ligge hjemme", body: "Tørt hele veien, både ut og hjem." },
-  cloudy: { headline: "La regnjakka ligge hjemme", body: "Tørt hele veien, både ut og hjem." },
-};
-
-const OUTCOMES: WeatherOutcome[] = ["rain", "sun", "cloudy"];
-
 export function MainScreen({ navigation }: Props) {
   const { state } = useOnboarding();
-  const { showApiError } = useApiError();
-  const [outcomeIndex, setOutcomeIndex] = useState(() => Math.floor(Math.random() * OUTCOMES.length));
-
-  useEffect(() => {
-    const userId = state.userId;
-    if (!userId) return;
-
-    const fetchWeather = () =>
-      getWeather(userId)
-        .then((outcome) => setOutcomeIndex(OUTCOMES.indexOf(outcome)))
-        .catch((error) => {
-          console.warn("Failed to fetch weather", error);
-          showApiError(fetchWeather);
-        });
-    fetchWeather();
-  }, [state.userId, showApiError]);
-
-  const outcome = OUTCOMES[outcomeIndex];
-  const { headline, body } = COPY[outcome];
+  const advice = useTodaysAdvice();
 
   return (
     <LinearGradient colors={[colors.paperTop, colors.paperBottom]} style={layoutStyles.canvas}>
       <SafeAreaView style={layoutStyles.card} edges={["top", "bottom"]}>
         <View style={styles.header}>
+          {advice?.kind === "dayOff" && <Text style={styles.eyebrow}>Fridag</Text>}
           <GearButton onPress={() => navigation.navigate("Settings")} />
         </View>
         <View style={styles.content}>
-          <View style={styles.icon}>
-            <WeatherIcon outcome={outcome} />
-          </View>
-          <Text style={styles.headline}>{headline}</Text>
-          <Text style={styles.body}>{body}</Text>
+          {!advice && <ActivityIndicator color={colors.ink} />}
+          {advice?.kind === "commute" && <CommuteView outcome={advice.outcome} />}
+          {advice?.kind === "dayOff" && <DayOffView intervals={advice.intervals} />}
         </View>
         <View style={layoutStyles.buttonBlock}>
           <DepartureTile value={state.leaveHome} onPress={() => navigation.navigate("Settings")} />

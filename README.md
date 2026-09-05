@@ -1,4 +1,4 @@
-# pos-app
+# Pøs
 
 npx eas-cli login
 npx expo-doctor
